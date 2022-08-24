@@ -1,45 +1,57 @@
+import Loader from 'components/Loader';
 import React, { Component } from 'react';
+import ImageGalleryItem from '../ImageGalleryItem';
 
 class ImageGallery extends Component {
   state = {
     images: null,
-    loading: false,
+    error: null,
+    status: 'idle',
   };
 
   componentDidUpdate(prevProps, prevState) {
-    // this.setState({ loading: true });
-
     const prevName = prevProps.searchName;
     const nextName = this.props.searchName;
     if (prevName !== nextName) {
-      console.log('update');
+      this.setState({ status: 'pending' });
       fetch(
         `https://pixabay.com/api/?q=${nextName}&page=1&key=28400374-5eacf081d2efacca1adf31c1f&image_type=photo&orientation=horizontal&per_page=12`
       )
-        .then(res => res.json())
-        .then(images => this.setState({ images }))
-        .finally(() => this.setState({ loading: false }));
+        .then(res => {
+          if (res.ok) {
+            return res.json();
+          }
+          return Promise.reject(
+            new Error(`Нет картинки с именем ${nextName}, введите другое`)
+          );
+        })
+        .then(images => this.setState({ images, status: 'resolved' }))
+        .catch(error => this.setState({ error, status: 'rejected' }));
     }
   }
 
   render() {
-    return (
-      <div>
-        {this.state.loading && <h1>Загружаем...</h1>}
-        {/* {this.state.images && (
-          <ul>
-            {this.state.images.map(image => {
-              return (
-                <li key={this.state.images.hits.id}>
-                  {this.state.images.hits.webformatURL}
-                </li>
-              );
-            })}
-          </ul>
-        )} */}
-        <h1>{this.props.searchName}</h1>
-      </div>
-    );
+    const { images, error, status } = this.state;
+
+    if (status === 'idle') {
+      return <h2>Введите запрос</h2>;
+    }
+
+    if (status === 'pending') {
+      return <Loader />;
+    }
+
+    if (status === 'reject') {
+      return <h1>{error.message}</h1>;
+    }
+
+    if (status === 'resolved') {
+      return (
+        <ul>
+          <ImageGalleryItem images={images.hits} />
+        </ul>
+      );
+    }
   }
 }
 
