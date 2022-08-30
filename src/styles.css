@@ -23,7 +23,7 @@ body {
 img {
   display: block;
   max-width: 100%;
-  height: auto;
+  height: 100%;
 }
 
 /*
@@ -121,6 +121,11 @@ img {
   font-size: 18px;
 }
 
+.Loader {
+  display: inline-flex;
+    justify-content: center;
+}
+
 /*
  * Стили компонента ImageGallery
  */
@@ -171,13 +176,13 @@ img {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.137);
   z-index: 1200;
 }
 
 .Modal {
-  max-width: calc(100vw - 100px);
-  max-height: auto;
+  max-width: calc(100vw - 200px);
+  max-height: calc(100vw - 100px);
 }
 
 /*
