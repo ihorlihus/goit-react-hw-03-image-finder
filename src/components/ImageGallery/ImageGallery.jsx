@@ -47,7 +47,7 @@ class ImageGallery extends Component {
 
     if (status === 'resolved') {
       return (
-        <ul>
+        <ul className="ImageGallery">
           <ImageGalleryItem images={images.hits} />
         </ul>
       );
