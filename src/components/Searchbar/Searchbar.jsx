@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 class Searchbar extends Component {
   state = {
     searchName: '',
+    page: 1,
   };
 
   handleChangeSearchName = e => {
@@ -18,8 +19,8 @@ class Searchbar extends Component {
       toast.error('Введите запрос');
       return;
     }
-    this.props.onSubmit(this.state.searchName);
-    this.setState({ searchName: '' });
+    this.props.onSubmit(this.state.searchName, this.state.page);
+    this.setState({ searchName: '', page: 1 });
   };
 
   render() {

@@ -7,10 +7,11 @@ import '../styles.css';
 export class App extends Component {
   state = {
     searchName: '',
+    page: 1,
   };
 
   handleFormSubmit = searchName => {
-    this.setState({ searchName });
+    this.setState({ searchName, page: 1 });
   };
 
   render() {

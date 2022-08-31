@@ -1,21 +1,23 @@
 import Loader from 'components/Loader';
 import React, { Component } from 'react';
 import ImageGalleryItem from '../ImageGalleryItem';
+import Button from '../Button';
 
 class ImageGallery extends Component {
   state = {
-    images: null,
+    images: [],
     error: null,
     status: 'idle',
+    page: 1,
   };
 
-  componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(prevProps, prevState) {
     const prevName = prevProps.searchName;
     const nextName = this.props.searchName;
-    if (prevName !== nextName) {
+    if (prevName !== nextName || prevState.page !== this.state.page) {
       this.setState({ status: 'pending' });
-      fetch(
-        `https://pixabay.com/api/?q=${nextName}&page=1&key=28400374-5eacf081d2efacca1adf31c1f&image_type=photo&orientation=horizontal&per_page=12`
+      await fetch(
+        `https://pixabay.com/api/?q=${nextName}&page=${this.state.page}&key=28400374-5eacf081d2efacca1adf31c1f&image_type=photo&orientation=horizontal&per_page=12`
       )
         .then(res => {
           if (res.ok) {
@@ -25,17 +27,30 @@ class ImageGallery extends Component {
             new Error(`Нет картинки с именем ${nextName}, введите другое`)
           );
         })
-        .then(images => this.setState({ images, status: 'resolved' }))
+        .then(res =>
+          this.setState(prevState => ({
+            images: [...prevState.images, ...res.hits],
+            status: 'resolved',
+          }))
+        )
         .catch(error => this.setState({ error, status: 'rejected' }));
     }
   }
 
+  handleLoadMore = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+    setTimeout(() => {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth',
+      });
+    }, 500);
+  };
+
   render() {
     const { images, error, status } = this.state;
-
-    if (status === 'idle') {
-      return <h2>Введите запрос</h2>;
-    }
 
     if (status === 'pending') {
       return <Loader />;
@@ -47,9 +62,12 @@ class ImageGallery extends Component {
 
     if (status === 'resolved') {
       return (
-        <ul className="ImageGallery">
-          <ImageGalleryItem images={images.hits} />
-        </ul>
+        <>
+          <ul className="ImageGallery">
+            <ImageGalleryItem images={images} />
+          </ul>
+          {images.length !== 0 && <Button onClick={this.handleLoadMore} />}
+        </>
       );
     }
   }
