@@ -6,7 +6,6 @@ import 'react-toastify/dist/ReactToastify.css';
 class Searchbar extends Component {
   state = {
     searchName: '',
-    page: 1,
   };
 
   handleChangeSearchName = e => {
